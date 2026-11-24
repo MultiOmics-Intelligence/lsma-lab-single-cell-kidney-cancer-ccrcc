@@ -1,0 +1,13 @@
+author_label	n_cells	agreement
+Bcell	68	0.0
+Endo_ACKR1	482	1.0
+Endo_PLVAP	2541	0.987
+Macro	3973	0.992
+Macro_MKI67	35	0.114
+Mast	63	1.0
+Peri	586	0.976
+Plasma	115	1.0
+Tcell	954	0.999
+Tcell_CD8	204	1.0
+Tumor	8065	0.984
+vSMC	2103	1.0

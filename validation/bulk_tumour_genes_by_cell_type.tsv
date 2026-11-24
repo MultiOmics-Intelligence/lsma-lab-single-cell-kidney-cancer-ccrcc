@@ -1,0 +1,11 @@
+cell_type	n_cells	mean_score_genes_up_in_tumour	mean_score_genes_down_in_tumour
+ccRCC tumour cells	7999	0.418	0.0072
+Endothelial cells	3004	0.2442	0.008
+NK cells	249	0.2136	0.0086
+Pericytes	2678	0.1926	0.008
+Macrophages	2628	0.1267	0.0069
+Monocytes	854	0.1036	0.0056
+Mast cells	69	0.0896	0.0056
+Dendritic cells	465	0.0877	0.0072
+Plasma cells	176	0.076	0.0044
+CD8 T cells	1067	0.0485	0.0047
