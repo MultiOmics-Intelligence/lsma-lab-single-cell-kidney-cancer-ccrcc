@@ -78,6 +78,52 @@ Evidence labels from the lab: clustering and embeddings are *exploratory*; cell-
 
 ---
 
+## Quality control and PCA
+
+Before any biology, every cell is checked. Single-cell data always contain empty droplets, broken cells and doublets (two cells captured together), and these have to be found and removed.
+
+### Quality control
+The lab sets thresholds **separately for each patient**, at the median ± a few median absolute deviations of genes detected, total counts and mitochondrial share. That matters here:
+- One patient (SS_2017) was sequenced less deeply: a median of about 850 genes per cell, against 2,000–2,600 for the others (Figure QC1).
+- A single fixed cut-off would have thrown most of that patient's cells away. Per-patient thresholds keep the cells that are good for that sample.
+
+| | |
+|---|---|
+| ![Genes per cell](figures/qc-pca-violin_n_genes_by_counts.png) **QC1.** Genes detected per cell, for each patient. | ![Mitochondrial share](figures/qc-pca-violin_pct_counts_mt.png) **QC2.** Mitochondrial share per cell: high values mark damaged cells. |
+| ![Counts vs genes](figures/qc-pca-scatter_counts_genes.png) **QC3.** Counts against genes. Healthy cells lie on one smooth band. | ![Doublet scores](figures/qc-pca-doublet_scores.png) **QC4.** Scrublet doublet scores. |
+
+**The result:**
+- 1,313 low-quality cells (6.4%) and 7 doublets were removed, leaving **19,189 cells** and 23,308 genes.
+- The median remaining cell has 2,171 genes, 7,286 counts and 3.1% mitochondrial reads.
+- The per-patient thresholds are in [`results/qc_thresholds.tsv`](results/qc_thresholds.tsv). The total counts per patient and the counts-against-mitochondria plot are in [`figures/`](figures).
+
+### PCA
+PCA condenses the 2,000 most variable genes into a few axes that capture most of the difference between cells. The first 30 components were used for clustering (Figure P1, scree plot).
+
+![PCA](figures/qc-pca-pca_by_patient_and_cell_type.png)
+
+**Figure P2.** PC1 against PC2 for all 19,189 cells, coloured by patient (left) and by cell type (right).
+
+Even before integration, the cells fall into **three arms**, and the genes that drive each axis explain them:
+
+| Direction | Cells | Top genes on that side |
+|---|---|---|
+| PC2 positive | **Tumour cells** | *KRT8*, *NNMT*, *NDUFA4L2*, *CRYAB*, *CD24* |
+| PC1 positive | **Vessel and stromal cells** (endothelium, pericytes) | *COL4A1*, *SPARC*, *SPARCL1*, *IGFBP7*, *EPAS1* |
+| Both negative | **Immune cells** (myeloid and T cells) | *TYROBP*, *AIF1*, *FCER1G*, HLA class II genes |
+
+The patients mix within the immune and vessel arms but less within the tumour arm, which is the first sign that each patient's cancer cells are distinct (see Key findings). The lab also checks whether a component simply tracks a technical measure such as sequencing depth (Figure P3).
+- **PC1 and PC2 follow biology:** their correlation with depth, genes detected, mitochondrial or ribosomal share and doublet score is weak (|ρ| ≤ 0.27).
+- **Some later components carry technical signal:** PC4 partly tracks depth and genes detected (ρ ≈ 0.5), PC5 the mitochondrial share (−0.59), and PC6 the ribosomal share (0.58).
+
+That is normal. Because these components are among the 30 used, the per-patient quality thresholds and the check that clusters are not defined by depth alone matter.
+
+| | |
+|---|---|
+| ![Scree](figures/qc-pca-scree.png) **P1.** Variance explained by each component. | ![PC vs QC](figures/qc-pca-pc_qc_correlation.png) **P3.** Correlation of each component with technical measures. |
+
+---
+
 ## Figures
 
 | | |
@@ -229,7 +275,8 @@ lsma-lab-single-cell-kidney-cancer-ccrcc/
 ├── report/                    the LSMA Analysis Lab's full report
 │   ├── LSMA-Analysis-Lab-report-kidney-cancer-single-cell.pdf
 │   └── LSMA-Analysis-Lab-report-kidney-cancer-single-cell.html
-├── figures/                   10 key figures, PNG (300 dpi) and vector PDF
+├── figures/                   key figures, PNG (300 dpi) and vector PDF
+│   ├── qc-pca-*                          quality control (violins, scatter, doublets) and PCA (scree, PC vs QC, PCA plot)
 │   ├── 01-annotation-embedding           ·  02/03-integration-embedding_before/after
 │   ├── 04-integration-integration_metrics ·  05-clustering-embedding
 │   ├── 06-clustering-marker_dotplot      ·  07-annotation-supporting_markers
