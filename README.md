@@ -306,7 +306,7 @@ lsma-lab-single-cell-kidney-cancer-ccrcc/
   - Korsunsky et al., *Nature Methods* 2019 (Harmony)
   - Wolock, Lopez & Klein, *Cell Systems* 2019 (Scrublet)
   - Traag, Waltman & van Eck, *Scientific Reports* 2019 (Leiden)
-- **Companion analyses:** [kidney cancer vs matched normal kidney, bulk RNA-seq](https://github.com/MultiOmics-Intelligence/lsma-lab-bulk-rnaseq-kidney-cancer-tcga-kirc) · [the kidney cancer methylome](https://github.com/MultiOmics-Intelligence/lsma-lab-dna-methylation-kidney-cancer-tcga-kirc) · [active enhancers, ChIP-seq](https://github.com/MultiOmics-Intelligence/lsma-lab-chip-seq-kidney-cancer-enhancers) · [somatic mutations and copy number](https://github.com/MultiOmics-Intelligence/lsma-lab-somatic-mutations-kidney-cancer-tcga-kirc) · [the kidney cancer proteome](https://github.com/MultiOmics-Intelligence/lsma-lab-proteomics-kidney-cancer-cptac).
+- **Companion analyses:** [kidney cancer vs matched normal kidney, bulk RNA-seq](https://github.com/MultiOmics-Intelligence/lsma-lab-bulk-rnaseq-kidney-cancer-tcga-kirc) · [the kidney cancer methylome](https://github.com/MultiOmics-Intelligence/lsma-lab-dna-methylation-kidney-cancer-tcga-kirc) · [active enhancers, ChIP-seq](https://github.com/MultiOmics-Intelligence/lsma-lab-chip-seq-kidney-cancer-enhancers) · [somatic mutations and copy number](https://github.com/MultiOmics-Intelligence/lsma-lab-somatic-mutations-kidney-cancer-tcga-kirc) · [the kidney cancer proteome](https://github.com/MultiOmics-Intelligence/lsma-lab-proteomics-kidney-cancer-cptac) · [the kidney cancer metabolome](https://github.com/MultiOmics-Intelligence/lsma-lab-metabolomics-kidney-cancer).
 
 ## Run it yourself
 
