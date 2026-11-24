@@ -17,6 +17,22 @@ This repository is a worked example from the **LSMA Analysis Lab**, the analysis
 
 ---
 
+## Why we share this analysis
+
+This is one of a series of worked examples from the **LSMA Analysis Lab**, published openly for five reasons:
+
+- **To show what the lab does, on real data.** Each repository takes one public dataset through one lab module, from import to report, and shows every step, figure and setting. Nothing is hidden or polished after the fact: the report here is the one the lab produced.
+- **To teach a complete analysis, not just a result.** Students see the parts that are usually skipped: quality control, the choice of statistics, an independent validation, and an honest list of limitations.
+- **To earn trust by checking known biology first.** These analyses deliberately reproduce findings that are already well established, such as the hypoxia programme and the Warburg switch in kidney cancer. A method that gets the known answers right can be trusted with new questions.
+- **To keep testing our own tools.** Every example is a real-world test of the lab. Running public data from start to finish shows what works and what needs fixing, and the fixes go back into the lab for every student. Two improvements have already come from this series: a more reliable import from NCBI GEO, and automatic choice of the right cell-type markers for each tissue in single-cell analysis.
+- **To make the work open and repeatable.** The data are public, every parameter and software version is listed, and diploma students can repeat the same analysis in the lab themselves.
+
+The series follows one cancer, clear cell kidney cancer, through every layer: genes, single cells, DNA methylation, enhancers, mutations, proteins and metabolites. Each repository links to the others.
+
+These are teaching examples. They are not new research findings and must not be used for medical decisions.
+
+---
+
 ## Biological question and aim
 
 **Question.** A bulk analysis of kidney tumours (our companion repository) showed hypoxia genes such as *CA9* switched on, and a strong immune signal. Bulk tissue mixes many cell types, so it can't say *which* cells are responsible. Which cells make up a clear cell kidney tumour, and where do those signals come from?
