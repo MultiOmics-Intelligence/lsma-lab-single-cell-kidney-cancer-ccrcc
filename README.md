@@ -306,7 +306,7 @@ lsma-lab-single-cell-kidney-cancer-ccrcc/
   - Korsunsky et al., *Nature Methods* 2019 (Harmony)
   - Wolock, Lopez & Klein, *Cell Systems* 2019 (Scrublet)
   - Traag, Waltman & van Eck, *Scientific Reports* 2019 (Leiden)
-- **Companion analysis:** [kidney cancer vs matched normal kidney, bulk RNA-seq](https://github.com/MultiOmics-Intelligence/lsma-lab-bulk-rnaseq-kidney-cancer-tcga-kirc).
+- **Companion analyses:** [kidney cancer vs matched normal kidney, bulk RNA-seq](https://github.com/MultiOmics-Intelligence/lsma-lab-bulk-rnaseq-kidney-cancer-tcga-kirc) · [the kidney cancer methylome](https://github.com/MultiOmics-Intelligence/lsma-lab-dna-methylation-kidney-cancer-tcga-kirc).
 
 ## Run it yourself
 
