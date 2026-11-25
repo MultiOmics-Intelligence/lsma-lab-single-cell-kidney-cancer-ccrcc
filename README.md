@@ -352,7 +352,7 @@ G is the gene set (a Hallmark set, or the S-phase or G2/M genes) and C is a cont
 **Trajectory: PAGA and diffusion pseudotime**
 
 $$
-\text{PAGA}_{ab} = \min\left(1,\ \frac{e_{ab}}{(e_a n_b + e_b n_a)/(n-1)}\right), \qquad \operatorname{dpt}(i) = \sqrt{\sum_{l} \left(\frac{\lambda_l}{1-\lambda_l}\right)^2 \left(\psi_l(i) - \psi_l(\text{root})\right)^2}
+\text{PAGA}_{ab} = \min\left(1,\ \frac{e_{ab}}{(e_a n_b + e_b n_a)/(n-1)}\right), \qquad \mathrm{dpt}(i) = \sqrt{\sum_{l} \left(\frac{\lambda_l}{1-\lambda_l}\right)^2 \left(\psi_l(i) - \psi_l(\text{root})\right)^2}
 $$
 
 For PAGA, $e_{ab}$ is the number of neighbour-graph links between cell types a and b, $e_a$ the links of cells of type a, $n_a$ the number of cells of type a and n all cells; the denominator is the number of links expected if cells were labelled at random. For pseudotime, $\psi_l$ and $\lambda_l$ are the eigenvectors and eigenvalues of a random walk on the cell graph (15 diffusion components, the constant one excluded; Scanpy adds a small term for it). Pseudotime is this distance from the root cell, the pericyte nearest to the pericytes' centre, divided by its largest value so that it runs from 0 to 1.
@@ -360,7 +360,7 @@ For PAGA, $e_{ab}$ is the number of neighbour-graph links between cell types a a
 **Transcription-factor activity: decoupler univariate linear model**
 
 $$
-x_{ig} = \beta_0 + \beta_1 w_{fg} + \varepsilon_g, \qquad \text{activity}_{if} = t = \frac{\hat{\beta}_1}{\operatorname{SE}(\hat{\beta}_1)}
+x_{ig} = \beta_0 + \beta_1 w_{fg} + \varepsilon_g, \qquad \text{activity}_{if} = t = \frac{\hat{\beta}_1}{\mathrm{SE}(\hat{\beta}_1)}
 $$
 
 For each cell i and transcription factor f, the expression of all genes is regressed on $w_{fg}$, the CollecTRI weight of gene g as a target of f (+1 activated, −1 repressed, 0 not a target). The activity is the t-value of the slope: positive when activated targets are high and repressed ones low. Factors with fewer than 5 targets in the data were skipped.
@@ -368,7 +368,7 @@ For each cell i and transcription factor f, the expression of all genes is regre
 **Cell-cell communication: LIANA rank aggregation**
 
 $$
-\beta_k = P\left(\operatorname{Beta}(k,\ m-k+1) \le r_{(k)}\right), \qquad \text{rank score} = \min\left(1,\ m \cdot \min_{k} \beta_k\right)
+\beta_k = P\left(\mathrm{Beta}(k,\ m-k+1) \le r_{(k)}\right), \qquad \text{rank score} = \min\left(1,\ m \cdot \min_{k} \beta_k\right)
 $$
 
 Five methods (CellPhoneDB, Connectome, log2FC, NATMI and SingleCellSignalR) each rank every ligand–receptor pair between two cell types; m is the number of their scores that measure the kind of evidence being combined. The ranks are divided by their maximum and sorted, $r_{(1)} \le \dots \le r_{(m)}$; $\beta_k$ asks how likely the k-th best rank would be this small if ranks were random. This robust rank aggregation is done separately for magnitude and specificity; a small score means a pair is ranked highly by most methods. It is a ranking, not a test of real signalling.
