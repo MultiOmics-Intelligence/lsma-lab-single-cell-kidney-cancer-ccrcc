@@ -4,32 +4,16 @@
 
 **Which cells make up a clear cell kidney tumour, and which of them carry the tumour's hypoxia programme?**
 
-This repository is a worked example from the **LSMA Analysis Lab**, the analysis platform of the [London School of Multiomics & AI](https://lsma.co.uk). The full analysis was run in the lab, without writing code: import from a public atlas, quality control, normalisation, integration across patients, clustering and cell-type annotation. The report, figures and tables it produced are here, with two validation checks.
+This repository is a worked example from the **LSMA Analysis Lab**, the analysis platform of the [London School of Multiomics & AI](https://lsma.co.uk). The full analysis was run in the lab, without writing code: import from a public atlas, quality control, normalisation, integration across patients, clustering, cell-type annotation, pathways, transcription-factor activity, cell-cell communication, trajectory and cell cycle. The report, figures and tables it produced are here, with two validation checks.
 
 | | |
 |---|---|
 | **Data** | Clear cell renal cell carcinoma atlas (Zhang et al., *PNAS* 2021), from [CELLxGENE](https://cellxgene.cziscience.com/e/be39785b-67cb-4177-be19-a40ee3747e45.cxg/) |
 | **Cells** | 20,509 cells from 7 patients (10x Genomics 3′ v2); 19,189 after quality control |
 | **Lab module** | Single-cell RNA-seq (workflow version 1.0.0) |
-| **Lab run time** | **12 min 13 s** for the whole analysis (plus 20 s to import the data from CELLxGENE); **12 min 52 s** with pathways, transcription factors, cell-cell communication, trajectory and cell cycle added |
+| **Lab run time** | **12 min 52 s** for the whole analysis, including the optional stages (plus 20 s to import the data from CELLxGENE) |
 | **Validation** | The authors' own cell labels, and the genes found in the bulk kidney cancer analysis ([companion repository](https://github.com/MultiOmics-Intelligence/lsma-lab-bulk-rnaseq-kidney-cancer-tcga-kirc)) |
 | **Result** | The lab's labels agree with the authors' for **98.4%** of cells; the bulk tumour genes sit in the **tumour cells** |
-
----
-
-## Why we share this analysis
-
-This is one of a series of worked examples from the **LSMA Analysis Lab**, published openly for five reasons:
-
-- **To show what the lab does, on real data.** Each repository takes one public dataset through one lab module, from import to report, and shows every step, figure and setting. Nothing is hidden or polished after the fact: the report here is the one the lab produced.
-- **To teach a complete analysis, not just a result.** Students see the parts that are usually skipped: quality control, the choice of statistics, an independent validation, and an honest list of limitations.
-- **To earn trust by checking known biology first.** These analyses deliberately reproduce findings that are already well established, such as the hypoxia programme and the Warburg switch in kidney cancer. A method that gets the known answers right can be trusted with new questions.
-- **To keep testing our own tools.** Every example is a real-world test of the lab. Running public data from start to finish shows what works and what needs fixing, and the fixes go back into the lab for every student. Two improvements have already come from this series: a more reliable import from NCBI GEO, and automatic choice of the right cell-type markers for each tissue in single-cell analysis.
-- **To make the work open and repeatable.** The data are public, every parameter and software version is listed, and diploma students can repeat the same analysis in the lab themselves.
-
-The series follows one cancer, clear cell kidney cancer, through every layer: genes, single cells, DNA methylation, enhancers, mutations, proteins, metabolites and lipids. Each repository links to the others.
-
-These examples are for education and must not be used for medical decisions.
 
 ---
 
@@ -90,13 +74,15 @@ A **bulk RNA-seq** experiment grinds a piece of tissue and measures the *average
    - **Immune and vessel cells:** after integration, these cells from all 7 patients mix well (Figure 3).
    - **Tumour cells:** these stay partly grouped by patient. That's expected, because each patient's cancer has its own mutations and copy-number changes, while normal cell types are alike between people.
 
+6. **Each cell type is run by its expected regulators, and the tumour cells carry the hypoxia and metabolic programme.** The vessel wall is the busiest signalling hub, and tumour cells signal to vessels and immune cells through VEGFA, osteopontin (SPP1) and MIF. See *Beyond cell types* below.
+
 Evidence labels from the lab: clustering and embeddings are *exploratory*; cell-type labels are *biological interpretation* from marker genes and should be read alongside the supporting markers (Figure 7).
 
 ---
 
 ## Beyond cell types: regulators, pathways, communication, trajectory and cell cycle
 
-The analysis was run a second time in the lab with its optional stages switched on: pathway interpretation and the advanced modules (cell cycle, trajectory, cell-cell communication and transcription-factor activity). The steps up to annotation are identical; the whole run took **12 min 52 s**. Settings: [`settings/analysis-settings-extended.json`](settings/analysis-settings-extended.json). The lab's report of this run: [`report/LSMA-Analysis-Lab-report-kidney-cancer-single-cell-extended.html`](report/LSMA-Analysis-Lab-report-kidney-cancer-single-cell-extended.html).
+The lab's optional stages were switched on in the same run: pathway interpretation and the advanced modules (cell cycle, trajectory, cell-cell communication and transcription-factor activity). Settings: [`settings/analysis-settings-extended.json`](settings/analysis-settings-extended.json).
 
 These stages group cells by the dataset's own labels (the CELLxGENE cell types: tumour cells, endothelial cells, pericytes, vascular smooth muscle, macrophages, T, B, plasma and mast cells), not by the lab's finer labels. The figures below were drawn from the lab's result tables in [`results/advanced/`](results/advanced).
 
@@ -177,8 +163,9 @@ That is normal. Because these components are among the 30 used, the per-patient 
 |---|---|
 | ![Cell types](figures/01-annotation-embedding.png) **Figure 1.** The ten cell populations on the UMAP. | ![After integration](figures/03-integration-embedding_after.png) **Figure 3.** Cells coloured by patient after Harmony integration. |
 | ![Marker dot plot](figures/06-clustering-marker_dotplot.png) **Figure 6.** Top marker genes of each cluster. | ![Composition](figures/09-annotation-cell_type_composition.png) **Figure 9.** Cell-type composition of each patient's tumour. |
+| ![Regulators and pathways](figures/12-advanced-tf_activity_and_pathways.png) **Figure 12.** Transcription-factor activity and Hallmark pathways per cell type. | ![Communication, trajectory, cell cycle](figures/13-advanced-communication_trajectory_cell_cycle.png) **Figure 13.** Cell-cell communication, trajectory from pericytes and cell-cycle phase. |
 
-All 10 figures are in [`figures/`](figures), as PNG (300 dpi) and vector PDF:
+All 12 figures are in [`figures/`](figures), as PNG (300 dpi) and vector PDF:
 
 | File | What it shows |
 |---|---|
@@ -191,10 +178,12 @@ All 10 figures are in [`figures/`](figures), as PNG (300 dpi) and vector PDF:
 | 08 | Marker-set scores |
 | 09 | Composition by patient |
 | 10 | Quality-control filtering |
+| 12 | Transcription-factor activity (lineage regulators) and Hallmark pathway scores per cell type |
+| 13 | Cell-cell communication, pseudotime from pericytes and cell-cycle phase |
 
 ## The full report
 
-The lab's own report covers every stage: what was done, why, the checks, the results and their limits. It's available as a [**PDF**](report/LSMA-Analysis-Lab-report-kidney-cancer-single-cell.pdf) or as [**HTML**](report/LSMA-Analysis-Lab-report-kidney-cancer-single-cell.html) (download it and open it in a browser for the interactive version).
+The lab's own report covers every stage, including the optional ones: what was done, why, the checks, the results and their limits. It's available as a [**PDF**](report/LSMA-Analysis-Lab-report-kidney-cancer-single-cell.pdf) or as [**HTML**](report/LSMA-Analysis-Lab-report-kidney-cancer-single-cell.html) (download it and open it in a browser for the interactive version).
 
 ## Summary tables ([`results/`](results))
 
@@ -204,6 +193,14 @@ The lab's own report covers every stage: what was done, why, the checks, the res
 | `cluster_marker_genes.tsv` | The top data-driven marker genes of each cluster (Wilcoxon test, Benjamini–Hochberg) |
 | `cluster_composition_by_sample.tsv` | How many cells of each patient fall in each cluster |
 | `qc_thresholds.tsv` | The quality-control thresholds used for each patient |
+| `advanced/tf_activity_by_cell_type.tsv` | Activity of every transcription factor in each cell type (decoupler, CollecTRI) |
+| `advanced/lineage_tf_activity_z.tsv` | The lineage regulators shown in Figure 12, scaled across cell types |
+| `advanced/hallmark_pathways_by_cell_type.tsv` | Hallmark pathways enriched among each cell type's marker genes |
+| `advanced/hallmark_scores_by_cell_type.tsv` | Mean Hallmark score per cell type |
+| `advanced/cell_communication_liana.tsv` | The top 5,000 ligand–receptor pairs between cell types (LIANA consensus) |
+| `advanced/communication_counts_top1pct.tsv` | Number of strong pairs between each sending and receiving cell type |
+| `advanced/pseudotime_by_cell_type.tsv` | Diffusion pseudotime from pericytes, summarised per cell type |
+| `advanced/cell_cycle_phase_by_cell_type.tsv` | Cells in G1, S and G2/M per cell type |
 
 ---
 
@@ -218,8 +215,16 @@ flowchart LR
     E --> F["Clustering<br/>Leiden, 20 clusters<br/>UMAP"]
     F --> G["Annotation<br/>kidney tumour marker panel"]
     G --> H["Report, figures,<br/>tables"]
-    G --> X["Extended run<br/>pathways, TF activity,<br/>communication, trajectory,<br/>cell cycle"]
-    X --> H
+    G --> P["Pathways<br/>Hallmark per cell type"]
+    G --> T["Transcription factors<br/>decoupler, CollecTRI"]
+    G --> L["Cell-cell communication<br/>LIANA consensus"]
+    G --> Q["Trajectory<br/>PAGA + diffusion pseudotime"]
+    G --> K["Cell cycle<br/>S and G2/M scores"]
+    P --> H
+    T --> H
+    L --> H
+    Q --> H
+    K --> H
     G --> V1["Validation 1<br/>vs the authors'<br/>own labels"]
     G --> V2["Validation 2<br/>bulk tumour genes<br/>in each cell type"]
     V1 --> H
@@ -229,7 +234,7 @@ flowchart LR
     classDef check fill:#2F7D5B,stroke:#2F7D5B,color:#F4F4F2
     classDef out fill:#FBEAE3,stroke:#D9481F,color:#0F1B33
     class A data
-    class B,C,D,E,F,G,X step
+    class B,C,D,E,F,G,P,T,L,Q,K step
     class V1,V2 check
     class H out
 ```
@@ -332,7 +337,6 @@ lsma-lab-single-cell-kidney-cancer-ccrcc/
 │   └── lsma-lab-kidney-single-cell-banner.svg     animated banner
 ├── report/                    the LSMA Analysis Lab's full report
 │   ├── LSMA-Analysis-Lab-report-kidney-cancer-single-cell.pdf
-│   ├── LSMA-Analysis-Lab-report-kidney-cancer-single-cell-extended.html   the extended run
 │   └── LSMA-Analysis-Lab-report-kidney-cancer-single-cell.html
 ├── figures/                   key figures, PNG (300 dpi) and vector PDF
 │   ├── qc-pca-*                          quality control (violins, scatter, doublets) and PCA (scree, PC vs QC, PCA plot)
@@ -359,6 +363,20 @@ lsma-lab-single-cell-kidney-cancer-ccrcc/
     ├── analysis-settings.json           every parameter, the marker panel and the random seed
     └── analysis-settings-extended.json  the extended run with the optional stages
 ```
+
+## Why we share this analysis
+
+This is one of a series of worked examples from the **LSMA Analysis Lab**, published openly for five reasons:
+
+- **To show what the lab does, on real data.** Each repository takes one public dataset through one lab module, from import to report, and shows every step, figure and setting. Nothing is hidden or polished after the fact: the report here is the one the lab produced.
+- **To teach a complete analysis, not just a result.** Students see the parts that are usually skipped: quality control, the choice of statistics, an independent validation, and an honest list of limitations.
+- **To earn trust by checking known biology first.** These analyses deliberately reproduce findings that are already well established, such as the hypoxia programme and the Warburg switch in kidney cancer. A method that gets the known answers right can be trusted with new questions.
+- **To keep testing our own tools.** Every example is a real-world test of the lab. Running public data from start to finish shows what works and what needs fixing, and the fixes go back into the lab for every student. Two improvements have already come from this series: a more reliable import from NCBI GEO, and automatic choice of the right cell-type markers for each tissue in single-cell analysis.
+- **To make the work open and repeatable.** The data are public, every parameter and software version is listed, and diploma students can repeat the same analysis in the lab themselves.
+
+The series follows one cancer, clear cell kidney cancer, through every layer: genes, single cells, DNA methylation, enhancers, mutations, proteins, metabolites and lipids. Each repository links to the others.
+
+These examples are for education and must not be used for medical decisions.
 
 ## Data source and credits
 
