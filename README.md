@@ -11,7 +11,7 @@ This repository is a worked example from the **LSMA Analysis Lab**, the analysis
 | **Data** | Clear cell renal cell carcinoma atlas (Zhang et al., *PNAS* 2021), from [CELLxGENE](https://cellxgene.cziscience.com/e/be39785b-67cb-4177-be19-a40ee3747e45.cxg/) |
 | **Cells** | 20,509 cells from 7 patients (10x Genomics 3′ v2); 19,189 after quality control |
 | **Lab module** | Single-cell RNA-seq (workflow version 1.0.0) |
-| **Lab run time** | **12 min 13 s** for the whole analysis (plus 20 s to import the data from CELLxGENE) |
+| **Lab run time** | **12 min 13 s** for the whole analysis (plus 20 s to import the data from CELLxGENE); **12 min 52 s** with pathways, transcription factors, cell-cell communication, trajectory and cell cycle added |
 | **Validation** | The authors' own cell labels, and the genes found in the bulk kidney cancer analysis ([companion repository](https://github.com/MultiOmics-Intelligence/lsma-lab-bulk-rnaseq-kidney-cancer-tcga-kirc)) |
 | **Result** | The lab's labels agree with the authors' for **98.4%** of cells; the bulk tumour genes sit in the **tumour cells** |
 
@@ -91,6 +91,37 @@ A **bulk RNA-seq** experiment grinds a piece of tissue and measures the *average
    - **Tumour cells:** these stay partly grouped by patient. That's expected, because each patient's cancer has its own mutations and copy-number changes, while normal cell types are alike between people.
 
 Evidence labels from the lab: clustering and embeddings are *exploratory*; cell-type labels are *biological interpretation* from marker genes and should be read alongside the supporting markers (Figure 7).
+
+---
+
+## Beyond cell types: regulators, pathways, communication, trajectory and cell cycle
+
+The analysis was run a second time in the lab with its optional stages switched on: pathway interpretation and the advanced modules (cell cycle, trajectory, cell-cell communication and transcription-factor activity). The steps up to annotation are identical; the whole run took **12 min 52 s**. Settings: [`settings/analysis-settings-extended.json`](settings/analysis-settings-extended.json). The lab's report of this run: [`report/LSMA-Analysis-Lab-report-kidney-cancer-single-cell-extended.html`](report/LSMA-Analysis-Lab-report-kidney-cancer-single-cell-extended.html).
+
+These stages group cells by the dataset's own labels (the CELLxGENE cell types: tumour cells, endothelial cells, pericytes, vascular smooth muscle, macrophages, T, B, plasma and mast cells), not by the lab's finer labels. The figures below were drawn from the lab's result tables in [`results/advanced/`](results/advanced).
+
+![Regulators and pathways](figures/12-advanced-tf_activity_and_pathways.png)
+
+**Figure 12.** Left: activity of known lineage transcription factors in each cell type, inferred from the expression of their target genes (decoupler with the CollecTRI network). Right: Hallmark pathway scores per cell type.
+
+1. **Each cell type is run by its expected regulators** (Figure 12, left). This is a check that the method works, as well as a description:
+   - **Tumour cells:** **HNF1B** and **PAX8**, the regulators of kidney tubule cells from which ccRCC arises, and **ARNT**, the partner of the hypoxia factors HIF-1α and HIF-2α. HIF1A itself is high in the tumour cells and the pericytes.
+   - **Endothelial cells:** ERG, SOX18 and HEY2. **Pericytes:** SMAD3 and FOXC2. **Vascular smooth muscle:** MYOCD, SRF and TCF21.
+   - **Macrophages:** SPI1 (PU.1), IRF8 and CIITA. **T cells:** IKZF1 and STAT4. **B cells:** EBF1. **Plasma cells:** PRDM1 (BLIMP-1) and XBP1. **Mast cells:** MITF and GATA2.
+2. **The tumour cells carry the metabolic programme seen in bulk tissue** (Figure 12, right). Hypoxia (2.0-fold enrichment among their marker genes, adjusted p = 4 × 10⁻¹⁰), glycolysis and fatty acid metabolism are highest in the tumour cells, the same switch found in the [bulk](https://github.com/MultiOmics-Intelligence/lsma-lab-bulk-rnaseq-kidney-cancer-tcga-kirc), [proteomics](https://github.com/MultiOmics-Intelligence/lsma-lab-proteomics-kidney-cancer-cptac) and [metabolomics](https://github.com/MultiOmics-Intelligence/lsma-lab-metabolomics-kidney-cancer) analyses. Angiogenesis is highest in pericytes and endothelium, and the interferon-γ response in macrophages.
+
+![Communication, trajectory and cell cycle](figures/13-advanced-communication_trajectory_cell_cycle.png)
+
+**Figure 13.** Left: number of strong ligand–receptor pairs between each sending and receiving cell type (LIANA consensus, top 1% by magnitude). Middle: diffusion pseudotime from pericytes. Right: cell-cycle phase per cell type.
+
+3. **Cell-cell communication** (Figure 13, left).
+   - **The blood-vessel wall is the busiest hub.** Pericytes, endothelial cells and smooth muscle send and receive the most strong signals, in keeping with the dense vasculature of ccRCC.
+   - **Tumour cells signal to the vessels and to immune cells.** To endothelial cells and pericytes they send VEGFA (to ITGB1), SPP1 (osteopontin, to integrins and S1PR1) and TIMP1. To macrophages and T cells they send SPP1 and VIM (both to CD44), MIF (to CD74–CXCR4) and CXCL14 (to CXCR4).
+   - **Antigen presentation to T cells.** Tumour cells, macrophages and endothelial cells present HLA class I to the T-cell receptor complex (HLA-B to CD3D, HLA-A/B to CD8A).
+4. **Trajectory** (Figure 13, middle). Pseudotime was started from the pericytes. Vascular smooth muscle cells follow them, which fits the known continuum of mural cells around blood vessels. The other cell types are unrelated lineages; their position on the pseudotime scale only reflects how far they are from pericytes, and it is **not** a developmental path. A tumour of mature cell types has no single trajectory; this module is most useful where cells really progress, for example in development or in T-cell exhaustion within one lineage.
+5. **Cell cycle** (Figure 13, right). 23% of tumour cells score in S or G2/M, and 32% of macrophages (the authors also found a dividing macrophage group). T and B cells score highest (70% and 62%). These are relative scores: they compare cells within this dataset, and for small or very different populations such as lymphocytes they are easily inflated. Only proliferation markers such as *MKI67* could confirm active division.
+
+Tables in [`results/advanced/`](results/advanced): `tf_activity_by_cell_type.tsv`, `lineage_tf_activity_z.tsv`, `hallmark_pathways_by_cell_type.tsv`, `hallmark_scores_by_cell_type.tsv`, `cell_communication_liana.tsv` (top 5,000 pairs), `communication_counts_top1pct.tsv`, `pseudotime_by_cell_type.tsv`, `cell_cycle_phase_by_cell_type.tsv`.
 
 ---
 
@@ -187,6 +218,8 @@ flowchart LR
     E --> F["Clustering<br/>Leiden, 20 clusters<br/>UMAP"]
     F --> G["Annotation<br/>kidney tumour marker panel"]
     G --> H["Report, figures,<br/>tables"]
+    G --> X["Extended run<br/>pathways, TF activity,<br/>communication, trajectory,<br/>cell cycle"]
+    X --> H
     G --> V1["Validation 1<br/>vs the authors'<br/>own labels"]
     G --> V2["Validation 2<br/>bulk tumour genes<br/>in each cell type"]
     V1 --> H
@@ -196,7 +229,7 @@ flowchart LR
     classDef check fill:#2F7D5B,stroke:#2F7D5B,color:#F4F4F2
     classDef out fill:#FBEAE3,stroke:#D9481F,color:#0F1B33
     class A data
-    class B,C,D,E,F,G step
+    class B,C,D,E,F,G,X step
     class V1,V2 check
     class H out
 ```
@@ -225,6 +258,13 @@ Every step below is a stage in the LSMA Analysis Lab, run with the settings in [
 7. **Annotation.**
    - Each cluster was scored against a kidney-tumour marker panel. Tumour cells: CA9, NDUFA4L2, ANGPTL4, PAX8, CP, NNMT. Panels also covered T, NK, B and plasma cells, macrophages, monocytes, dendritic and mast cells, endothelium, pericytes, smooth muscle, fibroblasts and proliferating cells.
    - Each label is reported with its confidence and the panel markers that are also data-driven markers of the cluster.
+
+8. **Extended run (optional stages).**
+   - **Interpretation:** Hallmark over-representation among each cell type's marker genes, and Hallmark scores per cell.
+   - **Transcription factors:** decoupler with the CollecTRI regulons.
+   - **Communication:** LIANA consensus of several methods, with 100 permutations.
+   - **Trajectory:** PAGA and diffusion pseudotime, rooted at the pericytes.
+   - **Cell cycle:** Scanpy's S and G2/M gene scores.
 
 **Software:** Scanpy, Harmony and Scrublet, in the versions listed in [`settings/analysis-settings.json`](settings/analysis-settings.json).
 
@@ -275,6 +315,8 @@ The comparison script is [`validation/validate_against_authors_and_bulk.py`](val
 - **Small populations are hard to label.** 68 B cells and 35 dividing macrophages weren't recognised by the panel.
 - **Tumour cells aren't proven malignant.** "Tumour cells" are identified by markers (*CA9*, *PAX8* and the hypoxia genes), not by their DNA. Copy-number inference, such as the loss of chromosome 3p, would confirm malignancy.
 - **Ambient RNA wasn't corrected.** That needs the unfiltered droplet data, which the public file doesn't include.
+- **The extended stages use the dataset's broad labels.** The lab's advanced modules group cells by the dataset's own cell types when it has them, so monocytes, dendritic cells and macrophages are one group there, and a monocyte-to-macrophage trajectory couldn't be rooted. Letting these modules use the lab's own labels is a planned improvement to the lab.
+- **Communication is predicted, not measured.** Ligand–receptor scores show which signals could pass between cell types from their RNA, not that they do.
 - **Seven patients.** Proportions vary from patient to patient (Figure 9), and seven tumours can't represent all ccRCC.
 - **A teaching example, not clinical advice.** These results are for education and must not be used to diagnose or treat anyone.
 
@@ -290,6 +332,7 @@ lsma-lab-single-cell-kidney-cancer-ccrcc/
 │   └── lsma-lab-kidney-single-cell-banner.svg     animated banner
 ├── report/                    the LSMA Analysis Lab's full report
 │   ├── LSMA-Analysis-Lab-report-kidney-cancer-single-cell.pdf
+│   ├── LSMA-Analysis-Lab-report-kidney-cancer-single-cell-extended.html   the extended run
 │   └── LSMA-Analysis-Lab-report-kidney-cancer-single-cell.html
 ├── figures/                   key figures, PNG (300 dpi) and vector PDF
 │   ├── qc-pca-*                          quality control (violins, scatter, doublets) and PCA (scree, PC vs QC, PCA plot)
@@ -297,11 +340,13 @@ lsma-lab-single-cell-kidney-cancer-ccrcc/
 │   ├── 04-integration-integration_metrics ·  05-clustering-embedding
 │   ├── 06-clustering-marker_dotplot      ·  07-annotation-supporting_markers
 │   ├── 08-annotation-annotation_scores   ·  09-annotation-cell_type_composition
+│   ├── 12-advanced-tf_activity_and_pathways · 13-advanced-communication_trajectory_cell_cycle
 │   └── 10-qc-filtering
 ├── results/                   summary tables (tab-separated)
 │   ├── cluster_annotation.tsv
 │   ├── cluster_marker_genes.tsv
 │   ├── cluster_composition_by_sample.tsv
+│   ├── advanced/              transcription factors, pathways, communication, pseudotime, cell cycle
 │   └── qc_thresholds.tsv
 ├── validation/                checks against the authors and the bulk analysis
 │   ├── validation-bulk-genes-in-single-cells.png / .pdf
@@ -311,7 +356,8 @@ lsma-lab-single-cell-kidney-cancer-ccrcc/
 │   ├── bulk_marker_genes_fraction_expressing.tsv
 │   └── validate_against_authors_and_bulk.py
 └── settings/
-    └── analysis-settings.json           every parameter, the marker panel and the random seed
+    ├── analysis-settings.json           every parameter, the marker panel and the random seed
+    └── analysis-settings-extended.json  the extended run with the optional stages
 ```
 
 ## Data source and credits

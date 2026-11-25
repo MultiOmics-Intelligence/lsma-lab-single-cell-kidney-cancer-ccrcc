@@ -1,0 +1,86 @@
+{
+  "workflow": "scrna-seq",
+  "workflow_version": "1.0.0",
+  "random_seed": 42,
+  "lab_run_time": "12 min 52 s (the whole analysis including interpretation and the advanced modules)",
+  "parameters": {
+    "import": {
+      "sample_column": null,
+      "max_cells": null
+    },
+    "qc": {
+      "threshold_mode": "mad",
+      "nmads": 5,
+      "nmads_mt": 3,
+      "max_pct_mt": 20,
+      "min_genes": 200,
+      "max_genes": null,
+      "min_counts": null,
+      "max_counts": null,
+      "doublet_method": "scrublet",
+      "remove_doublets": true,
+      "expected_doublet_rate": null,
+      "min_cells_per_gene": 3
+    },
+    "normalisation": {
+      "method": "lognorm",
+      "n_top_genes": 2000,
+      "target_sum": 10000,
+      "hvg_per_sample": true,
+      "regress_out": [],
+      "scale_max": 10
+    },
+    "dimensionality_reduction": {
+      "n_pcs": 30,
+      "n_neighbors": 15,
+      "umap_min_dist": 0.5,
+      "compute_tsne": true,
+      "n_pcs_compute": 50,
+      "metric": "euclidean",
+      "umap_spread": 1.0,
+      "tsne_perplexity": 30
+    },
+    "integration": {
+      "method": "harmony",
+      "batch_key": "sample",
+      "harmony_max_iter": 20,
+      "scvi_n_latent": 30,
+      "scvi_max_epochs": null,
+      "label_key": "author_cell_type",
+      "enabled": true
+    },
+    "clustering": {
+      "method": "leiden",
+      "resolution": 0.8,
+      "n_markers": 50
+    },
+    "annotation": {
+      "method": "marker_scoring",
+      "marker_panel": "blood_immune",
+      "manual_labels": {},
+      "export_seurat_rds": false,
+      "custom_markers": "ccRCC tumour cells: CA9, NDUFA4L2, ANGPTL4, PAX8, CP, NNMT; CD8 T cells: CD8A, CD8B, GZMK, CD3E; CD4 T cells: CD3E, CD4, IL7R, CD40LG; Regulatory T cells: FOXP3, IL2RA, CTLA4, CD3E; NK cells: NKG7, GNLY, KLRD1, KLRF1; B cells: MS4A1, CD79A, CD19, BANK1; Plasma cells: JCHAIN, MZB1, IGKC, CD79A; Macrophages: CD68, C1QA, C1QB, APOE, CD163; Monocytes: S100A8, S100A9, FCN1, LYZ, VCAN; Dendritic cells: CLEC9A, FCER1A, CD1C, LAMP3; Mast cells: TPSAB1, CPA3, KIT, MS4A2; Endothelial cells: PECAM1, VWF, PLVAP, ACKR1, CDH5; Pericytes: RGS5, PDGFRB, NOTCH3, KCNJ8; Smooth muscle cells: ACTA2, MYH11, TAGLN, DES; Fibroblasts: COL1A1, DCN, LUM, PDGFRA; Proliferating cells: MKI67, TOP2A, STMN1, TUBB"
+    },
+    "interpretation": {
+      "enabled": true,
+      "source": "markers",
+      "collections": [
+        "hallmark"
+      ],
+      "run_ora": true,
+      "run_gsea": false,
+      "score_collection": "hallmark"
+    },
+    "advanced": {
+      "enabled": true,
+      "modules": [
+        "cell_cycle",
+        "trajectory",
+        "communication",
+        "tf_activity"
+      ],
+      "root_group": "pericyte",
+      "communication_permutations": 100
+    }
+  }
+}
