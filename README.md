@@ -104,6 +104,10 @@ These stages group cells by the dataset's own labels (the CELLxGENE cell types: 
    - **The blood-vessel wall is the busiest hub.** Pericytes, endothelial cells and smooth muscle send and receive the most strong signals, in keeping with the dense vasculature of ccRCC.
    - **Tumour cells signal to the vessels and to immune cells.** To endothelial cells and pericytes they send VEGFA (to ITGB1), SPP1 (osteopontin, to integrins and S1PR1) and TIMP1. To macrophages and T cells they send SPP1 and VIM (both to CD44), MIF (to CD74–CXCR4) and CXCL14 (to CXCR4).
    - **Antigen presentation to T cells.** Tumour cells, macrophages and endothelial cells present HLA class I to the T-cell receptor complex (HLA-B to CD3D, HLA-A/B to CD8A).
+![Communication network](figures/14-advanced-communication_network.png)
+
+**Figure 14.** The cell-cell communication network. Left: links with 30 or more strong ligand–receptor pairs; arrow width shows how many. Right: what the tumour cells send to each cell type.
+
 4. **Trajectory** (Figure 13, middle). Pseudotime was started from the pericytes. Vascular smooth muscle cells follow them, which fits the known continuum of mural cells around blood vessels. The other cell types are unrelated lineages; their position on the pseudotime scale only reflects how far they are from pericytes, and it is **not** a developmental path. A tumour of mature cell types has no single trajectory; this module is most useful where cells really progress, for example in development or in T-cell exhaustion within one lineage.
 5. **Cell cycle** (Figure 13, right). 23% of tumour cells score in S or G2/M, and 32% of macrophages (the authors also found a dividing macrophage group). T and B cells score highest (70% and 62%). These are relative scores: they compare cells within this dataset, and for small or very different populations such as lymphocytes they are easily inflated. Only proliferation markers such as *MKI67* could confirm active division.
 
@@ -164,8 +168,9 @@ That is normal. Because these components are among the 30 used, the per-patient 
 | ![Cell types](figures/01-annotation-embedding.png) **Figure 1.** The ten cell populations on the UMAP. | ![After integration](figures/03-integration-embedding_after.png) **Figure 3.** Cells coloured by patient after Harmony integration. |
 | ![Marker dot plot](figures/06-clustering-marker_dotplot.png) **Figure 6.** Top marker genes of each cluster. | ![Composition](figures/09-annotation-cell_type_composition.png) **Figure 9.** Cell-type composition of each patient's tumour. |
 | ![Regulators and pathways](figures/12-advanced-tf_activity_and_pathways.png) **Figure 12.** Transcription-factor activity and Hallmark pathways per cell type. | ![Communication, trajectory, cell cycle](figures/13-advanced-communication_trajectory_cell_cycle.png) **Figure 13.** Cell-cell communication, trajectory from pericytes and cell-cycle phase. |
+| ![Communication network](figures/14-advanced-communication_network.png) **Figure 14.** The cell-cell communication network, and what the tumour cells send. | |
 
-All 12 figures are in [`figures/`](figures), as PNG (300 dpi) and vector PDF:
+All 13 figures are in [`figures/`](figures), as PNG (300 dpi) and vector PDF:
 
 | File | What it shows |
 |---|---|
@@ -180,10 +185,11 @@ All 12 figures are in [`figures/`](figures), as PNG (300 dpi) and vector PDF:
 | 10 | Quality-control filtering |
 | 12 | Transcription-factor activity (lineage regulators) and Hallmark pathway scores per cell type |
 | 13 | Cell-cell communication, pseudotime from pericytes and cell-cycle phase |
+| 14 | Cell-cell communication network |
 
 ## The full report
 
-The lab's own report covers every stage, including the optional ones: what was done, why, the checks, the results and their limits. It's available as a [**PDF**](report/LSMA-Analysis-Lab-report-kidney-cancer-single-cell.pdf) or as [**HTML**](report/LSMA-Analysis-Lab-report-kidney-cancer-single-cell.html) (download it and open it in a browser for the interactive version).
+The lab's own report covers every stage, including the optional ones: what was done, why, the checks, the results and their limits. The communication network (Figure 14) is added as a final appendix page. It's available as a [**PDF**](report/LSMA-Analysis-Lab-report-kidney-cancer-single-cell.pdf) or as [**HTML**](report/LSMA-Analysis-Lab-report-kidney-cancer-single-cell.html) (download it and open it in a browser for the interactive version).
 
 ## Summary tables ([`results/`](results))
 
@@ -345,6 +351,7 @@ lsma-lab-single-cell-kidney-cancer-ccrcc/
 │   ├── 06-clustering-marker_dotplot      ·  07-annotation-supporting_markers
 │   ├── 08-annotation-annotation_scores   ·  09-annotation-cell_type_composition
 │   ├── 12-advanced-tf_activity_and_pathways · 13-advanced-communication_trajectory_cell_cycle
+│   ├── 14-advanced-communication_network
 │   └── 10-qc-filtering
 ├── results/                   summary tables (tab-separated)
 │   ├── cluster_annotation.tsv
