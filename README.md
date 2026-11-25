@@ -281,6 +281,98 @@ Every step below is a stage in the LSMA Analysis Lab, run with the settings in [
 
 > **Note on the marker panel.** The lab's default panel at the time was designed for blood (PBMC). On this tumour it labelled the cancer cells as blood-cell types, because it contains no epithelial, endothelial or stromal markers. The lab now chooses the panel automatically from the tissue and disease a dataset names, and on this atlas it picks its new **Tumour microenvironment** panel. Choosing a panel that fits the tissue is the most important decision in marker-based annotation.
 
+## The mathematics behind the methods
+
+The formulas below are the ones the lab's code runs, in the variant it uses. Symbols are defined under each one.
+
+**Library-size normalisation and log transform**
+
+$$
+x_{ig} = \log\left(1 + 10^4 \cdot \frac{c_{ig}}{\sum_{h} c_{ih}}\right)
+$$
+
+Here $c_{ig}$ is the raw count of gene g in cell i, and the sum is that cell's total count. Every cell is scaled to 10,000 counts, so deeper-sequenced cells do not look more active, and the natural log of one plus the value tames very large counts.
+
+**Highly variable genes (Seurat v3 method)**
+
+$$
+v_g = \frac{1}{N-1} \sum_{i=1}^{N} \left( \frac{\min\left(c_{ig},\ \bar{c}_g + \hat{\sigma}_g \sqrt{N}\right) - \bar{c}_g}{\hat{\sigma}_g} \right)^2
+$$
+
+For each gene, $\bar c_g$ is its mean raw count over the N cells, and $\hat\sigma_g$ is the standard deviation expected for a gene of that mean, read from a smooth (loess) curve of log variance against log mean. A gene with a large standardised variance varies more than its expression level predicts. This was computed in each patient, and the 2,000 genes with the best median rank across patients were kept.
+
+**Scaling and principal component analysis**
+
+$$
+z_{ig} = \max\left(-10,\ \min\left(10,\ \frac{x_{ig} - \bar{x}_g}{s_g}\right)\right), \qquad Z = U \Sigma V^{\top}
+$$
+
+Each variable gene is centred on its mean and divided by its standard deviation, with values capped at ±10. PCA is the singular value decomposition of this cells × genes matrix Z: the columns of V are the gene loadings, and each cell's scores are its row of UΣ. The first 50 components were computed and the first 30 used.
+
+**Harmony integration**
+
+$$
+\hat{z}_i = z_i - \sum_{k} r_{ki} \sum_{b} W_{kb} \phi_{ib}
+$$
+
+Harmony works on the 30 PCA scores $z_i$ of each cell. It alternates two steps, for up to 20 rounds: a soft clustering that gives each cell a weight $r_{ki}$ for cluster k, penalised when a cluster is dominated by one patient; and, within each cluster, a penalised (ridge) linear fit of how each patient b shifts the scores ($W_{kb}$, with $\phi_{ib} = 1$ when cell i comes from patient b). The fitted patient shifts are then subtracted, so cells of the same type from different patients come together.
+
+**Neighbour graph and Leiden clustering**
+
+$$
+Q = \frac{1}{2m} \sum_{i,j} \left( A_{ij} - \gamma \cdot \frac{k_i k_j}{2m} \right) \delta(c_i, c_j)
+$$
+
+Each cell is linked to its 15 nearest neighbours in the Harmony space, and $A_{ij}$ is the weight of the link between cells i and j. Here $k_i$ is the total link weight of cell i, m the total weight in the graph, and δ is 1 when both cells are in the same cluster. Leiden searches for the clusters that make this modularity Q large, and the resolution γ = 0.8 sets how fine they are (20 clusters here).
+
+**Marker genes: Wilcoxon rank-sum test**
+
+$$
+U = R_1 - \frac{n_1(n_1+1)}{2}, \qquad z = \frac{U - n_1 n_2 / 2}{\sqrt{\dfrac{n_1 n_2}{12}\left[(n+1) - \dfrac{\sum_t (t^3 - t)}{n(n-1)}\right]}}
+$$
+
+For one gene, all cells are ranked by expression; $R_1$ is the sum of the ranks of the $n_1$ cells in the cluster, $n_2$ is the number of all other cells and n = n₁ + n₂. The sum over t corrects for tied values (t is the size of each group of ties). The p-value comes from the normal distribution and is adjusted with Benjamini–Hochberg; because the clusters were made from the same data, these p-values are used to rank genes.
+
+**Hallmark over-representation (hypergeometric test)**
+
+$$
+p = \sum_{j=k}^{\min(n,K)} \frac{\binom{K}{j}\binom{N-K}{n-j}}{\binom{N}{n}}, \qquad \text{fold enrichment} = \frac{k/n}{K/N}
+$$
+
+N is the number of background genes (the genes tested that belong to at least one Hallmark set), K the number of them in a Hallmark set, n the number of a cell type's marker genes and k the markers that fall in the set. The p-value is the chance of seeing k or more by random picking; it is then adjusted with Benjamini–Hochberg.
+
+**Gene-set and cell-cycle scores (Scanpy score_genes)**
+
+$$
+S_i = \frac{1}{|G|} \sum_{g \in G} x_{ig} - \frac{1}{|C|} \sum_{g \in C} x_{ig}
+$$
+
+G is the gene set (a Hallmark set, or the S-phase or G2/M genes) and C is a control set drawn at random from genes of similar average expression (genes are split into 25 expression bins). A cell is called G1 when both its S and G2/M scores are below zero, and otherwise S or G2/M, whichever score is higher.
+
+**Trajectory: PAGA and diffusion pseudotime**
+
+$$
+\text{PAGA}_{ab} = \min\left(1,\ \frac{e_{ab}}{(e_a n_b + e_b n_a)/(n-1)}\right), \qquad \operatorname{dpt}(i) = \sqrt{\sum_{l} \left(\frac{\lambda_l}{1-\lambda_l}\right)^2 \left(\psi_l(i) - \psi_l(\text{root})\right)^2}
+$$
+
+For PAGA, $e_{ab}$ is the number of neighbour-graph links between cell types a and b, $e_a$ the links of cells of type a, $n_a$ the number of cells of type a and n all cells; the denominator is the number of links expected if cells were labelled at random. For pseudotime, $\psi_l$ and $\lambda_l$ are the eigenvectors and eigenvalues of a random walk on the cell graph (15 diffusion components, the constant one excluded; Scanpy adds a small term for it). Pseudotime is this distance from the root cell, the pericyte nearest to the pericytes' centre, divided by its largest value so that it runs from 0 to 1.
+
+**Transcription-factor activity: decoupler univariate linear model**
+
+$$
+x_{ig} = \beta_0 + \beta_1 w_{fg} + \varepsilon_g, \qquad \text{activity}_{if} = t = \frac{\hat{\beta}_1}{\operatorname{SE}(\hat{\beta}_1)}
+$$
+
+For each cell i and transcription factor f, the expression of all genes is regressed on $w_{fg}$, the CollecTRI weight of gene g as a target of f (+1 activated, −1 repressed, 0 not a target). The activity is the t-value of the slope: positive when activated targets are high and repressed ones low. Factors with fewer than 5 targets in the data were skipped.
+
+**Cell-cell communication: LIANA rank aggregation**
+
+$$
+\beta_k = P\left(\operatorname{Beta}(k,\ m-k+1) \le r_{(k)}\right), \qquad \text{rank score} = \min\left(1,\ m \cdot \min_{k} \beta_k\right)
+$$
+
+Five methods (CellPhoneDB, Connectome, log2FC, NATMI and SingleCellSignalR) each rank every ligand–receptor pair between two cell types; m is the number of their scores that measure the kind of evidence being combined. The ranks are divided by their maximum and sorted, $r_{(1)} \le \dots \le r_{(m)}$; $\beta_k$ asks how likely the k-th best rank would be this small if ranks were random. This robust rank aggregation is done separately for magnitude and specificity; a small score means a pair is ranked highly by most methods. It is a ranking, not a test of real signalling.
+
 ---
 
 ## Validation
